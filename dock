@@ -1,0 +1,35 @@
+# Download base image ubuntu 20.04
+FROM ubuntu:20.04
+
+RUN apt-get update && \
+      apt-get -y install -y sudo
+
+RUN apt-get install -y openjdk-11-jdk
+RUN ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
+RUN export JAVA_HOME
+RUN javac -version
+
+RUN apt install -y curl
+RUN curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get -y update
+RUN apt-get install -y git-core zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev nodejs yarn
+
+RUN apt-get clean all && apt-get update -qq && apt-get install -y build-essential libpq-dev \
+    curl gnupg2 apt-utils default-libmysqlclient-dev git libcurl3-dev cmake \
+    libssl-dev pkg-config openssl imagemagick file nodejs yarn
+
+RUN cd
+RUN git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+RUN echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+RUN echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+RUN exec $SHELL
+
+RUN git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+RUN echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+RUN exec $SHELL
+
+RUN rbenv install 2.6.6
+RUN rbenv global 2.6.6
+RUN ruby -v
